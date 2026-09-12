@@ -121,9 +121,10 @@ allocproc(void)
   }
   return 0;
 
-found:
+found: //initialize the process
   p->pid = allocpid();
   p->state = USED;
+  p->cputime = 0; // TASK 3 - initialize cputime field to 0 when the process is created
 
   // Allocate a trapframe page.
   if ((p->trapframe = (struct trapframe *)kalloc()) == 0) {

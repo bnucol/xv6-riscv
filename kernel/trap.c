@@ -82,8 +82,10 @@ usertrap(void)
     kexit(-1);
 
   // give up the CPU if this is a timer interrupt.
-  if (which_dev == 2)
+  if (which_dev == 2) { // checks if the interrupt value from which_dev was a timer interrupt
+    p->cputime++; // TASK 3 - increment cpu time when the process uses up its timeslice
     yield();
+  }
 
   prepare_return();
 
@@ -154,8 +156,10 @@ kerneltrap()
   }
 
   // give up the CPU if this is a timer interrupt.
-  if (which_dev == 2 && myproc() != 0)
+  if (which_dev == 2 && myproc() != 0) { // checks if the interrupt value from which_dev is a timer interrupt, and if the process is pointing at a non-null address
+    myproc()->cputime++; // TASK 3 - increment cpu time when the process uses up its timeslice
     yield();
+  }
 
   // the yield() may have caused some traps to occur,
   // so restore trap registers for use by kernelvec.S's sepc instruction.
