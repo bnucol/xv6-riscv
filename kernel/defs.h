@@ -103,6 +103,7 @@ void            yield(void);
 int             either_copyout(int user_dst, uint64 dst, void *src, uint64 len);
 int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void            procdump(void);
+int		kwait2(uint64, uint64); // TASK 4 - add kwait2() so it's visible outside of proc.c
 
 // swtch.S
 void            swtch(struct context*, struct context*);

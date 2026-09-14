@@ -5,6 +5,7 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
+#include "pstat.h" // TASK 4 - include pstat.h so kwait2() can use the rusage struct
 
 struct cpu cpus[NCPU];
 
@@ -698,5 +699,72 @@ procdump(void)
       state = "???";
     printk("%d %s %s", p->pid, state, p->name);
     printk("\n");
+  }
+}
+
+// TASK 4 - implement kwait2()
+int
+kwait2(uint64 addr, uint64 rusageaddress)
+{
+  struct proc *pp;
+  int havekids, pid;
+  struct proc *p = myproc();
+
+  acquire(&wait_lock);
+
+  for (;;) {
+    // Scan through table looking for exited children.
+    havekids = 0;
+    for (pp = proc; pp < &proc[NPROC]; pp++) {
+      if (pp->parent == p) {
+        // make sure the child isn't still in exit() or swtch().
+        acquire(&pp->lock);
+
+        havekids = 1;
+        if (pp->state == ZOMBIE) {
+          // Found one.
+          pid = pp->pid;
+          if (addr != 0 &&
+              copyout(p->pagetable, p->sz, addr, (char *)&pp->xstate,
+                      sizeof(pp->xstate)) < 0) { // check if the passed address is not null; if not, write the data to the process's memory. if the return value is negative (indicating an error), release the locks on both the
+						 //  process and the waitlock and return an error value (-1)
+            release(&pp->lock);
+            release(&wait_lock);
+            return -1;
+          }
+	  //TASK 4 - add code to previous wait() function implementation to return the rusage parameter
+	  struct rusage procrusage; // declare an rusage struct and store the child process's cpu time in the struct
+	  procrusage.cputime = pp->cputime;
+
+	  if (rusageaddress != 0 &&
+              copyout(p->pagetable, p->sz, rusageaddress, (char *)&procrusage,
+                      sizeof(procrusage)) < 0) { // check if the passed rusage address is not null; if not, write the data to the process's memory. if the return value is negative (indicating an error), release the locks on both the
+                                                 //  process and the waitlock and return an error value (-1)
+            release(&pp->lock);
+            release(&wait_lock);
+            return -1;
+          }
+
+          pp->parent = 0; // if the child process is in zombie state, clean the process and return the child pid
+          freeproc(pp);
+          release(&pp->lock);
+          release(&wait_lock);
+          return pid;
+        }
+        release(&pp->lock);
+      }
+    }
+
+    // No point waiting if we don't have any children.
+    if (!havekids || killed(p)) {
+      release(&wait_lock);
+      return -1;
+    }
+
+    // Wait for a child to exit.
+    sleep_prepare(p); //DOC: wait-sleep
+    release(&wait_lock);
+    sleep();
+    acquire(&wait_lock);
   }
 }

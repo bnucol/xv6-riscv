@@ -110,3 +110,15 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+// TASK 4 - implement sys_wait2()
+uint64 sys_wait2(void) {
+  uint64 p;
+  uint64 rusage; // add variable for the rusage parameter
+
+  argaddr(0, &p);
+  argaddr(1, &rusage); // get the rusage argument from the parameters
+
+  return kwait2(p, rusage); // pass the addresses of the exit status and rusage to wait2 and return the result (child pid or error code)
+
+}

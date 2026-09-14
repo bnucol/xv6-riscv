@@ -1,5 +1,9 @@
 #define SBRK_ERROR ((char *)-1)
 
+// TASK 4 - add rusage and system call prototype
+struct rusage; // allows rusage to be used in user code
+int wait2(int*, struct rusage*); // similar to an interface in Java; prototype for wait2 function
+
 struct stat;
 
 // system calls
