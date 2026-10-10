@@ -4,6 +4,9 @@
 struct rusage; // allows rusage to be used in user code
 int wait2(int*, struct rusage*); // similar to an interface in Java; prototype for wait2 function
 
+// PA2 TASK 1 - add pstat prototype
+struct pstat;
+
 struct stat;
 
 // system calls
@@ -29,6 +32,7 @@ char *sys_sbrk(int, int);
 int pause(int);
 int uptime(void);
 int sync(void);
+int getprocs(struct pstat*); // PA2 TASK 1 - include getprocs() as a system call so user programs can call it
 
 // ulib.c
 int stat(const char *, struct stat *);
@@ -52,3 +56,4 @@ void printf(const char *, ...) __attribute__((format(printf, 1, 2)));
 // umalloc.c
 void *malloc(uint);
 void free(void *);
+

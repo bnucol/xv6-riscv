@@ -104,6 +104,7 @@ extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
 extern uint64 sys_sync(void);
 extern uint64 sys_wait2(void); // TASK 4 - add wait2 system call info
+extern uint64 sys_getprocs(void); // PA2 TASK 1 - add getprocs system call info
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -132,6 +133,7 @@ static uint64 (*syscalls[])(void) = {
   [SYS_close]   = sys_close,
   [SYS_sync]    = sys_sync,
   [SYS_wait2]   = sys_wait2, // TASK 4 - add wait2 system call info
+  [SYS_getprocs]= sys_getprocs, // PA2 TASK 1 - add getprocs system call info
   // clang-format on
 };
 

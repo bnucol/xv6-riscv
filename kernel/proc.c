@@ -5,7 +5,7 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
-#include "pstat.h" // TASK 4 - include pstat.h so kwait2() can use the rusage struct
+#include "pstat.h" // TASK 4 - include pstat.h so kwait2() can use the rusage struct // PA2 TASK 1 - include pstat.h so kgetprocs() can use the pstat struct
 
 struct cpu cpus[NCPU];
 
@@ -767,4 +767,53 @@ kwait2(uint64 addr, uint64 rusageaddress)
     sleep();
     acquire(&wait_lock);
   }
+}
+
+// PA2 TASK 1 - implement kgetprocs() to do the getprocs() operation and return its result
+int kgetprocs(uint64 pstatAddr) {
+  int numProcesses = 0;
+
+  struct proc *p; // pointer that will point at each proc as it iterates through the proc table
+  struct pstat procStats; // struct that will track each process's details (pid, state, size, etc.)
+
+  acquire(&wait_lock); // lock the parent-child process links so they do not break when child processes are being linked
+
+  for(int i = 0; i < NPROC; i++) { // iterate through the process table
+    p = &proc[i]; // get the address of the current process
+
+    acquire(&p->lock); // lock the process values so they are not changed during reading
+    if(p->state == UNUSED) { // check if the state is unused; if so, continue. otherwise, increment the number of processes
+      release(&p->lock); // unlock the process values after reading
+      continue;
+    } else {
+      // populate the struct procStats with the current process's details
+      procStats.pid = p->pid;
+      procStats.state = p->state;
+      procStats.size = p->sz;
+
+      if(p->parent) { // if the current process has a parent, assign its corresponding parent pid; otherwise, set the parent pid to 0
+        procStats.ppid = p->parent->pid;
+      } else {
+        procStats.ppid = 0;
+      }
+
+      safestrcpy(procStats.name, p->name, sizeof(procStats.name)); // since strings are an array of chars in C, so we need to use safestrcpy to copy the entire string
+      // parameters: destination, source, max size of the string
+
+      if (copyout(myproc()->pagetable, myproc()->sz, pstatAddr + numProcesses * sizeof(struct pstat), (char*)&procStats, sizeof(procStats)) < 0) { // write the data to the user program's memory. if the return value is negative (indicating an error), release the lock on the current process's info and the lock on the parent-child links
+        // parameters: user program memory to write to, size of the struct process, location in memory to write to, address of the info to copy (in this case, the procStats struct), and how many bytes are being copied
+        release(&p->lock);
+	release(&wait_lock);
+        return -1;
+     }
+
+      numProcesses++;
+    }
+
+    release(&p->lock); // unlock the process values after reading
+  }
+
+  release(&wait_lock); // unlock the parent-child links after all processes have been read
+
+  return numProcesses;
 }

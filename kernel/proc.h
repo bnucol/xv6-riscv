@@ -76,7 +76,10 @@ struct trapframe {
   /* 280 */ uint64 t6;
 };
 
+#ifndef PROCSTATE_DEFINED // PA2 TASK 1 - checks if procstate was not defined; if so, define procstate here; otherwise, skip the lines until the endif
+#define PROCSTATE_DEFINED // PA2 TASK 1 - declare procstate flag so other pstat.h and proc.h files do not attempt to define it again
 enum procstate { UNUSED, USED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
+#endif // PA2 TASK 1 - closes the ifndef statement
 
 // Per-process state
 struct proc {

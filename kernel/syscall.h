@@ -22,3 +22,4 @@
 #define SYS_close  21
 #define SYS_sync   22
 #define SYS_wait2  23 // TASK 4 - add wait2 system call info
+#define SYS_getprocs 24 // PA2 TASK 1 - define syscall info

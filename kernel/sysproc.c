@@ -122,3 +122,12 @@ uint64 sys_wait2(void) {
   return kwait2(p, rusage); // pass the addresses of the exit status and rusage to wait2 and return the result (child pid or error code)
 
 }
+
+// PA2 TASK 1 - implement sys_getprocs()
+uint64 sys_getprocs(void) {
+  uint64 p; // declare the pstat array address argument from the user
+
+  argaddr(0, &p); // get the user pointer from the pstat argument
+  return kgetprocs(p); // call the kernel operation for getprocs()
+
+}
