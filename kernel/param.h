@@ -12,3 +12,6 @@
 #define FSSIZE      2000              // size of file system in blocks
 #define MAXPATH     128               // maximum file path name
 #define USERSTACK   1                 // user stack pages
+#define ROUND_ROBIN_SCHED 0	      // PA2 TASK 4 - add round robin scheduling policy option
+#define PRIORITY_SCHED    1	      // PA2 TASK 4 - add priority scheduling policy option
+#define SCHEDULER PRIORITY_SCHED      // PA2 TASK 4 - set the scheduler policy to priority scheduler at compilation

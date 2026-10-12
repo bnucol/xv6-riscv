@@ -450,25 +450,66 @@ scheduler(void)
     intr_off();
 
     int found = 0;
-    for (p = proc; p < &proc[NPROC]; p++) {
-      acquire(&p->lock);
-      if (p->state == RUNNABLE) {
-        // Switch to chosen process.  It is the process's job
-        // to release its lock and then reacquire it
-        // before jumping back to us.
-        p->state = RUNNING;
-        c->proc = p;
-        swtch(&c->context, &p->context);
 
-        // Don't re-enable interrupts on release.
-        mycpu()->intena = 0;
+    if(SCHEDULER == ROUND_ROBIN_SCHED) { // PA2 TASK 4 - check what scheduler is selected; this case handles the round robin logic
+      for (p = proc; p < &proc[NPROC]; p++) {
+        acquire(&p->lock);
+        if (p->state == RUNNABLE) {
+          // Switch to chosen process.  It is the process's job
+          // to release its lock and then reacquire it
+          // before jumping back to us.
+          p->state = RUNNING;
+          c->proc = p;
+          swtch(&c->context, &p->context);
 
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
-        found = 1;
+          // Don't re-enable interrupts on release.
+          mycpu()->intena = 0;
+
+          // Process is done running for now.
+          // It should have changed its p->state before coming back.
+          c->proc = 0;
+          found = 1;
+        }
+        release(&p->lock);
       }
-      release(&p->lock);
+    } else if(SCHEDULER == PRIORITY_SCHED) { // PA2 TASK 4 - check what scheduler is selected; this case handles the priority scheduler logic
+      struct proc *highestPriorityProc = 0; // track the proc with the highest priority
+      int highestPriorityVal = -1; // track the priority value of that proc
+
+      for(p = proc; p < &proc[NPROC]; p++) { // iterate through the process table and find the process with the highest priority
+	acquire(&p->lock);
+	if(p->state == RUNNABLE && p->priority > highestPriorityVal) {
+	  highestPriorityProc = p;
+	  highestPriorityVal = p->priority;
+	}
+
+	release(&p->lock);
+      }
+
+      if(highestPriorityProc != 0) { // if there is a highest priority proc; if so, switch the current process to it
+
+	acquire(&highestPriorityProc->lock); // lock the values of highestPriorityProc so they don't change during reading
+
+	if(highestPriorityProc->state == RUNNABLE) { // check if the proc's state is still runnable
+	  // Switch to chosen process.  It is the process's job
+          // to release its lock and then reacquire it
+          // before jumping back to us.
+          highestPriorityProc->state = RUNNING;
+          c->proc = highestPriorityProc;
+          swtch(&c->context, &highestPriorityProc->context);
+
+          // Don't re-enable interrupts on release.
+          mycpu()->intena = 0;
+
+          // Process is done running for now.
+          // It should have changed its p->state before coming back.
+          c->proc = 0;
+          found = 1;
+
+	}
+
+	release(&highestPriorityProc->lock); // unlock the values of highestPriorityProc after reading
+      }
     }
     if (found == 0) {
       // nothing to run; stop running on this core until an interrupt.
