@@ -126,6 +126,7 @@ found: //initialize the process
   p->pid = allocpid();
   p->state = USED;
   p->cputime = 0; // TASK 3 - initialize cputime field to 0 when the process is created
+  p->priority = 0; // PA2 TASK 2 - initialize priority field to 0 when the process is created
 
   // Allocate a trapframe page.
   if ((p->trapframe = (struct trapframe *)kalloc()) == 0) {
@@ -277,7 +278,9 @@ kfork(void)
   }
   np->sz = p->sz;
 
-  // copy saved user registers.
+  np->priority = p->priority; // PA2 TASK 2 - when a child process is created through fork(), the child inherits the parent's priority
+
+ // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
 
   // Cause fork to return 0 in the child.
@@ -790,6 +793,7 @@ int kgetprocs(uint64 pstatAddr) {
       procStats.pid = p->pid;
       procStats.state = p->state;
       procStats.size = p->sz;
+      procStats.priority = p->priority; // PA2 TASK 2 - populate the priority in to the procStats struct
 
       if(p->parent) { // if the current process has a parent, assign its corresponding parent pid; otherwise, set the parent pid to 0
         procStats.ppid = p->parent->pid;

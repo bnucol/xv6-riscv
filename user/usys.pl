@@ -45,3 +45,5 @@ entry("uptime");
 entry("sync");
 entry("wait2"); # TASK 4 - add wait2() entry
 entry("getprocs"); # PA2 TASK 1 - add getprocs() entry
+entry("getpriority"); # PA2 TASK 2 - add getpriority() entry
+entry("setpriority"); # PA2 TASK 2 - add setpriority() entry

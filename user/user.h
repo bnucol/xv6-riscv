@@ -33,6 +33,8 @@ int pause(int);
 int uptime(void);
 int sync(void);
 int getprocs(struct pstat*); // PA2 TASK 1 - include getprocs() as a system call so user programs can call it
+int getpriority(void); // PA2 TASK 2 - include getpriority() as a system call so user programs can call it
+int setpriority(int); // PA2 TASK 2 - include setpriority() as a system call so user programs can call it
 
 // ulib.c
 int stat(const char *, struct stat *);

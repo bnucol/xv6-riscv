@@ -21,11 +21,11 @@ main(int argc, char **argv)
   if (nprocs < 0)
     exit(-1);
 
-  printf("pid\tstate\t\tsize\tppid\tname\n");
+  printf("pid\tstate\t\tsize\tppid\tname\tpriority\n"); // PA2 TASK 2 - add priority column to displayed proc stats
   for (i=0; i<nprocs; i++) {
     state = states[uproc[i].state];
-    printf("%d\t%s\t%ld\t%d\t%s\n", uproc[i].pid, state,
-                   uproc[i].size, uproc[i].ppid, uproc[i].name);
+    printf("%d\t%s\t%ld\t%d\t%s\t%d\n", uproc[i].pid, state,
+                   uproc[i].size, uproc[i].ppid, uproc[i].name, uproc[i].priority); // PA2 TASK 2 - add priority information to display with the rest of the proc stats
   }
 
   exit(0);

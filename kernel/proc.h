@@ -106,4 +106,6 @@ struct proc {
   char name[16];               // Process name (debugging)
 
   uint cputime; // TASK 3 - add cputime field to struct proc
+
+  int priority; // PA2 TASK 2 - add priority attribute to struct proc
 };

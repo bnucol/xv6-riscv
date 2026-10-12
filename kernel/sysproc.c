@@ -131,3 +131,33 @@ uint64 sys_getprocs(void) {
   return kgetprocs(p); // call the kernel operation for getprocs()
 
 }
+
+// PA2 TASK 2 - implement sys_getpriority()
+uint64 sys_getpriority(void) {
+  struct proc *currProcess = myproc(); // get the process that called this syscall
+  int currProcessPriority; // declare variable that will store the current process's priority
+
+  acquire(&currProcess->lock); // lock the process info so it doesn't change when being read
+  currProcessPriority = currProcess->priority; // store the current process's priority into the variable
+  release(&currProcess->lock); // unlock the process info since it is not being read anymore
+
+  return currProcessPriority; // return the priority of the current process
+}
+
+// PA2 TASK 2 - implement sys_setpriority()
+uint64 sys_setpriority(void) {
+  struct proc *currProcess = myproc(); // get the process that called this syscall
+  int inputPriority; // declare variable that will store the inputted priority
+
+  argint(0, &inputPriority); // read the value of the input priority that was passed into the syscall
+
+  if(!(inputPriority >= 0 && inputPriority <= 49)) { // check if the input priority is not in the range of priorities (0-49 in the instructions); if so, return -1 since this value is out of range
+    return -1;
+  }
+
+  acquire(&currProcess->lock); // lock the current process's info so it doesn't change when being read
+  currProcess->priority = inputPriority; // set the current process's priority to the input value
+  release(&currProcess->lock); // unlock the current process's info since it is not being read anymore
+
+  return 0; // return 0 since the operation was successful
+}
