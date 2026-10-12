@@ -229,6 +229,7 @@ userinit(void)
   p->cwd = namei("/");
 
   p->state = RUNNABLE;
+  p->readytime = ticks; // PA2 TASK 3 - initialize readytime to the current time whenever state changes to runnable
 
   release(&p->lock);
 }
@@ -304,6 +305,8 @@ kfork(void)
 
   acquire(&np->lock);
   np->state = RUNNABLE;
+  np->readytime = ticks; // PA2 TASK 3 - initialize readytime to the current time whenever state changes to runnable
+
   release(&np->lock);
 
   return pid;
@@ -508,6 +511,7 @@ yield(void)
   struct proc *p = myproc();
   acquire(&p->lock);
   p->state = RUNNABLE;
+  p->readytime = ticks; // PA2 TASK 3 - initialize readytime to the current time whenever state changes to runnable
   sched();
   release(&p->lock);
 }
@@ -594,6 +598,7 @@ wakeup(void *chan)
       // go to sleep, also set it back to RUNNING.
       if (p->state == SLEEPING) {
         p->state = RUNNABLE;
+	p->readytime = ticks; // PA2 TASK 3 - initialize readytime to the current time whenever state changes to runnable
       }
     }
     release(&p->lock);
@@ -615,6 +620,7 @@ kkill(int pid)
       if (p->state == SLEEPING) {
         // Wake process from sleep().
         p->state = RUNNABLE;
+	p->readytime = ticks; // PA2 TASK 3 - initialize readytime to the current time whenever state changes to runnable
       }
       release(&p->lock);
       return 0;
@@ -794,6 +800,7 @@ int kgetprocs(uint64 pstatAddr) {
       procStats.state = p->state;
       procStats.size = p->sz;
       procStats.priority = p->priority; // PA2 TASK 2 - populate the priority in to the procStats struct
+      procStats.readytime = p->readytime; // PA2 TASK 3 - populate the readytime in to the procStats struct
 
       if(p->parent) { // if the current process has a parent, assign its corresponding parent pid; otherwise, set the parent pid to 0
         procStats.ppid = p->parent->pid;

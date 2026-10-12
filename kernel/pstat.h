@@ -14,4 +14,5 @@ struct pstat { // PA2 TASK 1 - add pstat struct
 	int ppid; // Parent process ID
 	char name[16]; // Parent command name
 	int priority; // PA2 TASK 2 - add process priority attribute to the pstat struct
+	uint readytime; // PA2 TASK 3 - add readytime attribute to the pstat struct
 };

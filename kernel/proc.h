@@ -108,4 +108,5 @@ struct proc {
   uint cputime; // TASK 3 - add cputime field to struct proc
 
   int priority; // PA2 TASK 2 - add priority attribute to struct proc
+  uint readytime; // PA2 TASK 3 - add readytime attribute to struct proc
 };
