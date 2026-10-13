@@ -15,3 +15,4 @@
 #define ROUND_ROBIN_SCHED 0	      // PA2 TASK 4 - add round robin scheduling policy option
 #define PRIORITY_SCHED    1	      // PA2 TASK 4 - add priority scheduling policy option
 #define SCHEDULER PRIORITY_SCHED      // PA2 TASK 4 - set the scheduler policy to priority scheduler at compilation
+#define MAXEFFPRIORITY 99	      // PA2 TASK 5 - set the max effective priority value to 99 (as explained in the lab instructions)

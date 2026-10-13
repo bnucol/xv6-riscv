@@ -426,6 +426,18 @@ kwait(uint64 addr)
   }
 }
 
+// PA2 TASK 5 - calculate the effective priority of a process
+int calculateEffPriority(struct proc *p) {
+  uint currTime = ticks;
+  int procEffPriority = p->priority + (currTime - p->readytime) / 10; // calculate the effective priority of the process (AGING POLICY - +1 priority for every 10 ticks of waiting in the runnable state)
+
+  if(procEffPriority > MAXEFFPRIORITY) { // check if the calculated effective priority exceeds the max effective priority; if so, set the effective priority to the max
+    procEffPriority = MAXEFFPRIORITY;
+  }
+
+  return procEffPriority;
+}
+
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
 // Scheduler never returns.  It loops, doing:
@@ -478,9 +490,12 @@ scheduler(void)
 
       for(p = proc; p < &proc[NPROC]; p++) { // iterate through the process table and find the process with the highest priority
 	acquire(&p->lock);
-	if(p->state == RUNNABLE && p->priority > highestPriorityVal) {
+
+	int procEffPriority = calculateEffPriority(p); // PA2 TASK 5 - calculate the process's effective priority
+
+	if(p->state == RUNNABLE && procEffPriority > highestPriorityVal) { // PA2 TASK 5 - update to check against the process's effective priority instead of its regular priority
 	  highestPriorityProc = p;
-	  highestPriorityVal = p->priority;
+	  highestPriorityVal = procEffPriority;
 	}
 
 	release(&p->lock);
